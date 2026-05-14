@@ -3,78 +3,58 @@
 <head>
     <meta charset="utf-8">
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://unpkg.com/postmonger@0.0.16/postmonger.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <script src="https://unpkg.com/postmonger@0.0.18/postmonger.js"></script>
 </head>
 
 <body>
 
 <h2>MuleSoft Cancellation</h2>
-
-<p>Ready to send cancellations to MuleSoft</p>
+<p>Custom Activity Ready</p>
 
 <script>
 
-(function () {
+var connection = new Postmonger.Session();
+var payload = {};
 
-    'use strict';
+connection.on('initActivity', initialize);
 
-    var connection = new Postmonger.Session();
-    var payload = {};
+$(window).ready(onRender);
 
-    $(window).ready(onRender);
+function onRender() {
 
-    function onRender() {
-        connection.trigger('ready');
-        connection.trigger('requestTriggerEventDefinition');
+    connection.trigger('ready');
+
+    connection.trigger('updateButton', {
+        button: 'done',
+        enabled: true
+    });
+}
+
+function initialize(data) {
+
+    if (data) {
+        payload = data;
     }
+}
 
-    connection.on(
-        'initActivity',
-        initialize
+connection.on('clickedDone', function () {
+
+    payload['arguments'] =
+        payload['arguments'] || {};
+
+    payload['metaData'] =
+        payload['metaData'] || {};
+
+    payload.metaData.isConfigured = true;
+
+    connection.trigger(
+        'updateActivity',
+        payload
     );
+});
 
-    function initialize(data) {
-
-        if (data) {
-            payload = data;
-        }
-
-        connection.trigger(
-            'updateButton',
-            {
-                button: 'done',
-                enabled: true
-            }
-        );
-    }
-
-    connection.on(
-        'clickedDone',
-        save
-    );
-
-    function save() {
-
-        payload.arguments =
-            payload.arguments || {};
-
-        payload.arguments.execute =
-            payload.arguments.execute || {};
-
-        payload.arguments.execute.inArguments = [
-            {
-                status: 'cancelada'
-            }
-        ];
-
-        connection.trigger(
-            'updateActivity',
-            payload
-        );
-    }
-
-})();
 </script>
 
 </body>
