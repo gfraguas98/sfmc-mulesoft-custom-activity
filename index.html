@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/postmonger@latest/postmonger.js"></script>
+    <script src="https://sfmc-mulesoft-custom-activity.onrender.com/postmonger.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -54,7 +54,6 @@
             margin-top: 4px;
         }
 
-
         #loadingMsg {
             color: #888;
             font-style: italic;
@@ -102,11 +101,11 @@ var connection = new Postmonger.Session();
 var payload    = {};
 var schema     = [];
 
-$(window).ready(function () {
+document.addEventListener('DOMContentLoaded', function () {
     connection.trigger('ready');
 });
 
-/* ── 1. Recibir el schema de la Entry Source ── */
+/* 1. Recibir el schema de la Entry Source */
 connection.on('requestedSchema', function (data) {
     $('#loadingMsg').hide();
 
@@ -118,33 +117,26 @@ connection.on('requestedSchema', function (data) {
     }
 
     schema.forEach(function (field) {
-        var key   = field.key;          // e.g. "Event.DE_Name.FieldName"
+        var key   = field.key;
         var label = field.label || key;
 
-        var opt1 = $('<option>').val(key).text(label);
-        var opt2 = $('<option>').val(key).text(label);
-
-        $('#idCitaField').append(opt1);
-        $('#fechaCitaField').append(opt2);
+        $('#idCitaField').append($('<option>').val(key).text(label));
+        $('#fechaCitaField').append($('<option>').val(key).text(label));
     });
 
-    /* Restaurar selección si ya había configuración guardada */
     restoreFromPayload();
 
-    /* Habilitar botón Done */
     connection.trigger('updateButton', { button: 'done', enabled: true });
 });
 
-/* ── 2. Recibir payload guardado (al reabrir la actividad) ── */
+/* 2. Recibir payload guardado (al reabrir la actividad) */
 connection.on('initActivity', function (data) {
     payload = data || {};
-
-    /* requestSchema aquí para asegurarnos de tener el schema antes de restaurar */
     $('#loadingMsg').show();
     connection.trigger('requestSchema');
 });
 
-/* ── 3. Restaurar valores guardados en los selects ── */
+/* 3. Restaurar valores guardados en los selects */
 function restoreFromPayload() {
     try {
         var inArgs = payload
@@ -164,7 +156,7 @@ function restoreFromPayload() {
     }
 }
 
-/* ── 4. Guardar al pulsar Done ── */
+/* 4. Guardar al pulsar Done */
 connection.on('clickedDone', function () {
 
     var idCita    = $('#idCitaField').val();
