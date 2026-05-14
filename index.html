@@ -1,10 +1,67 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>SFMC Activity</title>
+    <meta charset="utf-8">
+    <title>MuleSoft Cancellation</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="https://unpkg.com/postmonger@0.0.16/postmonger.js"></script>
 </head>
+
 <body>
-    <h1>SFMC Custom Activity</h1>
-    <p>Running OK</p>
+
+    <h3>MuleSoft Cancellation</h3>
+
+    <p>
+        This activity sends cancelled appointments
+        to MuleSoft in real time.
+    </p>
+
+    <script>
+
+        var connection = new Postmonger.Session();
+        var payload = {};
+
+        $(window).ready(function () {
+
+            connection.trigger('ready');
+            connection.trigger('requestTokens');
+            connection.trigger('requestEndpoints');
+        });
+
+        connection.on('initActivity', function (data) {
+
+            if (data) {
+                payload = data;
+            }
+
+            connection.trigger('updateButton', {
+                button: 'next',
+                enabled: true
+            });
+        });
+
+        connection.on('clickedNext', function () {
+
+            payload.metaData = payload.metaData || {};
+            payload.arguments = payload.arguments || {};
+            payload.arguments.execute =
+                payload.arguments.execute || {};
+
+            payload.arguments.execute.inArguments = [
+                {
+                    status: 'cancelada'
+                }
+            ];
+
+            connection.trigger(
+                'updateActivity',
+                payload
+            );
+        });
+
+    </script>
+
 </body>
 </html>
