@@ -2,7 +2,6 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>MuleSoft Cancellation</title>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://unpkg.com/postmonger@0.0.16/postmonger.js"></script>
@@ -10,29 +9,72 @@
 
 <body>
 
-<h3>MuleSoft Cancellation</h3>
-<p>Activity ready</p>
+<h2>MuleSoft Cancellation</h2>
+
+<p>Ready to send cancellations to MuleSoft</p>
 
 <script>
+
+(function () {
+
+    'use strict';
+
     var connection = new Postmonger.Session();
     var payload = {};
 
-    $(window).ready(function () {
+    $(window).ready(onRender);
+
+    function onRender() {
         connection.trigger('ready');
-    });
+        connection.trigger('requestTriggerEventDefinition');
+    }
 
-    connection.on('initActivity', function(data) {
-        payload = data || {};
+    connection.on(
+        'initActivity',
+        initialize
+    );
 
-        connection.trigger('updateButton', {
-            button: 'done',
-            enabled: true
-        });
-    });
+    function initialize(data) {
 
-    connection.on('clickedDone', function() {
-        connection.trigger('updateActivity', payload);
-    });
+        if (data) {
+            payload = data;
+        }
+
+        connection.trigger(
+            'updateButton',
+            {
+                button: 'done',
+                enabled: true
+            }
+        );
+    }
+
+    connection.on(
+        'clickedDone',
+        save
+    );
+
+    function save() {
+
+        payload.arguments =
+            payload.arguments || {};
+
+        payload.arguments.execute =
+            payload.arguments.execute || {};
+
+        payload.arguments.execute.inArguments = [
+            {
+                status: 'cancelada'
+            }
+        ];
+
+        connection.trigger(
+            'updateActivity',
+            payload
+        );
+    }
+
+})();
 </script>
 
 </body>
