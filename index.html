@@ -4,56 +4,157 @@
     <meta charset="utf-8">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
     <script src="https://unpkg.com/postmonger@0.0.18/postmonger.js"></script>
+
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+    </style>
 </head>
 
 <body>
 
 <h2>MuleSoft Cancellation</h2>
-<p>Custom Activity Ready</p>
+
+<label>Campo Id_Cita</label>
+<select id="idCitaField">
+    <option value="">Selecciona un campo</option>
+</select>
+
+<label>Status</label>
+<input id="status"
+       type="text"
+       value="Cancelled">
+
+<label>Fecha</label>
+<input id="fecha"
+       type="text"
+       value="Hoy">
 
 <script>
 
 var connection = new Postmonger.Session();
 var payload = {};
-
-connection.on('initActivity', initialize);
+var eventDefinitionKey;
 
 $(window).ready(onRender);
 
 function onRender() {
-
     connection.trigger('ready');
-
-    connection.trigger('updateButton', {
-        button: 'done',
-        enabled: true
-    });
+    connection.trigger('requestTriggerEventDefinition');
 }
 
-function initialize(data) {
+connection.on(
+    'requestedTriggerEventDefinition',
+    function (eventDefinitionModel) {
 
-    if (data) {
-        payload = data;
+        const fields =
+            eventDefinitionModel
+                ?.dataExtensionName
+                ? eventDefinitionModel.schema
+                : [];
+
+        if (
+            eventDefinitionModel &&
+            eventDefinitionModel.schema &&
+            eventDefinitionModel.schema.arguments &&
+            eventDefinitionModel.schema.arguments.execute &&
+            eventDefinitionModel.schema.arguments.execute.inArguments
+        ) {
+
+            const inArgs =
+                eventDefinitionModel
+                    .schema
+                    .arguments
+                    .execute
+                    .inArguments;
+
+            inArgs.forEach(field => {
+
+                Object.keys(field)
+                    .forEach(key => {
+
+                    $('#idCitaField')
+                        .append(
+                            `<option value="${key}">
+                                ${key}
+                            </option>`
+                        );
+                });
+            });
+        }
+
+        connection.trigger(
+            'updateButton',
+            {
+                button: 'done',
+                enabled: true
+            }
+        );
     }
-}
+);
 
-connection.on('clickedDone', function () {
+connection.on(
+    'initActivity',
+    function(data) {
 
-    payload['arguments'] =
-        payload['arguments'] || {};
+        payload = data || {};
+    }
+);
 
-    payload['metaData'] =
-        payload['metaData'] || {};
+connection.on(
+    'clickedDone',
+    save
+);
+
+function save() {
+
+    const selectedField =
+        $('#idCitaField').val();
+
+    const status =
+        $('#status').val();
+
+    payload.metaData =
+        payload.metaData || {};
 
     payload.metaData.isConfigured = true;
+
+    payload.arguments =
+        payload.arguments || {};
+
+    payload.arguments.execute = {
+        inArguments: [
+            {
+                Id_Cita:
+                    `{{Event.${selectedField}}}`,
+                Status:
+                    status,
+                Fecha:
+                    "{{Context.ExecutionDate}}"
+            }
+        ]
+    };
 
     connection.trigger(
         'updateActivity',
         payload
     );
-});
+}
 
 </script>
 
