@@ -7,17 +7,18 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-// ROOT = CONFIG.JSON
+// ROOT = CONFIG.JSON (IMPORTANTE)
 app.get('/', (req, res) => {
+    res.type('application/json');
     res.sendFile(path.join(__dirname, 'config.json'));
 });
 
-// CONFIG UI
+// UI DEL MODAL
 app.get('/ui', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// JOURNEY ENDPOINTS
+// JOURNEY CALLBACKS
 app.post('/save', (req, res) => {
     console.log('SAVE');
     return res.status(200).json({});
@@ -39,7 +40,6 @@ app.post('/stop', (req, res) => {
 });
 
 app.post('/execute', (req, res) => {
-
     console.log('EXECUTE');
     console.log(JSON.stringify(req.body, null, 2));
 
