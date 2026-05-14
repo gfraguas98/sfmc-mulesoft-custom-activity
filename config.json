@@ -1,7 +1,9 @@
 {
   "workflowApiVersion": "1.1",
   "metaData": {
-    "category": "custom"
+    "icon": "https://sfmc-mulesoft-custom-activity.onrender.com/icon.png",
+    "category": "custom",
+    "isConfigured": false
   },
   "type": "REST",
   "lang": {
@@ -12,37 +14,51 @@
   },
   "arguments": {
     "execute": {
-      "url": "https://sfmc-mulesoft-custom-activity.onrender.com/execute",
-      "verb": "POST",
       "inArguments": [],
       "outArguments": [],
+      "url": "https://sfmc-mulesoft-custom-activity.onrender.com/execute",
+      "verb": "POST",
       "body": "",
-      "format": "json"
+      "header": "",
+      "format": "json",
+      "useJwt": false
     }
   },
   "configurationArguments": {
     "save": {
       "url": "https://sfmc-mulesoft-custom-activity.onrender.com/save",
-      "verb": "POST"
+      "verb": "POST",
+      "useJwt": false
     },
     "publish": {
       "url": "https://sfmc-mulesoft-custom-activity.onrender.com/publish",
-      "verb": "POST"
+      "verb": "POST",
+      "useJwt": false
     },
     "validate": {
       "url": "https://sfmc-mulesoft-custom-activity.onrender.com/validate",
-      "verb": "POST"
+      "verb": "POST",
+      "useJwt": false
     },
     "stop": {
       "url": "https://sfmc-mulesoft-custom-activity.onrender.com/stop",
-      "verb": "POST"
+      "verb": "POST",
+      "useJwt": false
     }
   },
   "userInterfaces": {
     "configModal": {
       "url": "https://sfmc-mulesoft-custom-activity.onrender.com/index.html",
-      "height": 400,
-      "width": 600
+      "height": 500,
+      "width": 800
+    }
+  },
+  "schema": {
+    "arguments": {
+      "execute": {
+        "inArguments": [],
+        "outArguments": []
+      }
     }
   }
 }
