@@ -8,8 +8,14 @@ app.use(bodyParser.json());
 
 // ROOT = CONFIG.JSON
 app.get('/', (req, res) => {
-    res.type('application/json');
-    res.sendFile(path.join(__dirname, 'config.json'));
+    res.setHeader(
+        'Content-Type',
+        'application/json'
+    );
+
+    res.sendFile(
+        path.join(__dirname, 'config.json')
+    );
 });
 
 // UI HTML (archivo en raíz)
