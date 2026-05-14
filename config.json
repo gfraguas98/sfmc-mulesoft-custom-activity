@@ -1,8 +1,7 @@
 {
   "workflowApiVersion": "1.1",
   "metaData": {
-    "category": "custom",
-    "icon": "https://sfmc-mulesoft-custom-activity.onrender.com/icon.png"
+    "category": "custom"
   },
   "type": "REST",
   "lang": {
@@ -13,20 +12,14 @@
   },
   "arguments": {
     "execute": {
-      "inArguments": [
-        {
-          "appointmentId": "{{Event.AppointmentId}}",
-          "appointmentDate": "{{Event.AppointmentDate}}",
-          "contactKey": "{{Contact.Key}}"
-        }
-      ],
       "url": "https://sfmc-mulesoft-custom-activity.onrender.com/execute",
       "verb": "POST",
-      "body": "",
-      "format": "json"
+      "inArguments": [],
+      "outArguments": []
     }
   },
   "configurationArguments": {
+    "applicationExtensionKey": "mulesoft-cancellation",
     "save": {
       "url": "https://sfmc-mulesoft-custom-activity.onrender.com/save"
     },
