@@ -40,7 +40,7 @@
   },
   "userInterfaces": {
     "configModal": {
-      "url": "https://sfmc-mulesoft-custom-activity.onrender.com/ui",
+      "url": "https://sfmc-mulesoft-custom-activity.onrender.com/index.html",
       "height": 400,
       "width": 600
     }
