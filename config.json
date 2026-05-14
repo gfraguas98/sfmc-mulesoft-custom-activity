@@ -2,7 +2,7 @@
   "workflowApiVersion": "1.1",
   "metaData": {
     "category": "custom",
-    "isConfigured": false
+    "icon": "https://sfmc-mulesoft-custom-activity.onrender.com/icon.png"
   },
   "type": "REST",
   "lang": {
@@ -13,45 +13,39 @@
   },
   "arguments": {
     "execute": {
+      "inArguments": [
+        {
+          "Id_Cita": "",
+          "Fecha_Cita": "",
+          "Status": "Cancelada"
+        }
+      ],
       "url": "https://sfmc-mulesoft-custom-activity.onrender.com/execute",
       "verb": "POST",
-      "inArguments": [],
-      "outArguments": [],
       "body": "",
-      "format": "json"
+      "format": "json",
+      "timeout": 10000
     }
   },
   "configurationArguments": {
     "save": {
-      "url": "https://sfmc-mulesoft-custom-activity.onrender.com/save",
-      "verb": "POST"
+      "url": "https://sfmc-mulesoft-custom-activity.onrender.com/save"
     },
     "publish": {
-      "url": "https://sfmc-mulesoft-custom-activity.onrender.com/publish",
-      "verb": "POST"
+      "url": "https://sfmc-mulesoft-custom-activity.onrender.com/publish"
     },
     "validate": {
-      "url": "https://sfmc-mulesoft-custom-activity.onrender.com/validate",
-      "verb": "POST"
+      "url": "https://sfmc-mulesoft-custom-activity.onrender.com/validate"
     },
     "stop": {
-      "url": "https://sfmc-mulesoft-custom-activity.onrender.com/stop",
-      "verb": "POST"
+      "url": "https://sfmc-mulesoft-custom-activity.onrender.com/stop"
     }
   },
   "userInterfaces": {
     "configModal": {
       "url": "https://sfmc-mulesoft-custom-activity.onrender.com/index.html",
-      "height": 550,
-      "width": 800
-    }
-  },
-  "schema": {
-    "arguments": {
-      "execute": {
-        "inArguments": [],
-        "outArguments": []
-      }
+      "height": 400,
+      "width": 600
     }
   }
 }
