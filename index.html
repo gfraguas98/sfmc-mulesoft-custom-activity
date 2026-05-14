@@ -2,160 +2,196 @@
 <html>
 <head>
     <meta charset="utf-8">
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://unpkg.com/postmonger@0.0.18/postmonger.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/postmonger@latest/postmonger.js"></script>
     <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            font-family: Arial;
-            padding: 20px;
+            font-family: Arial, sans-serif;
+            padding: 24px;
+            background: #fff;
+            font-size: 14px;
+            color: #333;
+        }
+
+        h2 {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+
+        .field-group {
+            margin-bottom: 18px;
         }
 
         label {
             display: block;
-            margin-top: 15px;
             font-weight: bold;
+            margin-bottom: 6px;
+            color: #444;
         }
 
-        select, input {
+        select, input[type="text"] {
             width: 100%;
-            padding: 8px;
-            margin-top: 5px;
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 14px;
+            background: #fafafa;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #0078d4;
+            background: #fff;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+
+        #loadingMsg {
+            color: #888;
+            font-style: italic;
+            font-size: 13px;
+            margin-bottom: 14px;
+            display: none;
         }
     </style>
 </head>
-
 <body>
 
-<h2>MuleSoft Cancellation</h2>
+<h2>MuleSoft Cancellation — Configuración</h2>
 
-<label>Campo Id_Cita</label>
-<select id="idCitaField">
-    <option value="">Selecciona un campo</option>
-</select>
+<div id="loadingMsg">Cargando campos del Entry Source...</div>
 
-<label>Status</label>
-<input id="status"
-       type="text"
-       value="Cancelled">
+<!-- Id_Cita -->
+<div class="field-group">
+    <label for="idCitaField">Campo Id_Cita</label>
+    <select id="idCitaField">
+        <option value="">— Selecciona un campo —</option>
+    </select>
+    <div class="hint">Campo de la DE de entrada que contiene el identificador de la cita.</div>
+</div>
 
-<label>Fecha</label>
-<input id="fecha"
-       type="text"
-       value="Hoy">
+<!-- Fecha_Cita -->
+<div class="field-group">
+    <label for="fechaCitaField">Campo Fecha_Cita</label>
+    <select id="fechaCitaField">
+        <option value="">— Selecciona un campo —</option>
+    </select>
+    <div class="hint">Campo de la DE de entrada que contiene la fecha de la cita.</div>
+</div>
+
+<!-- Status (editable) -->
+<div class="field-group">
+    <label for="statusField">Status</label>
+    <input id="statusField"
+           type="text"
+           placeholder="Ej: Cancelada">
+    <div class="hint">Texto libre que se enviará a MuleSoft como valor de Status.</div>
+</div>
 
 <script>
-
 var connection = new Postmonger.Session();
-var payload = {};
-var eventDefinitionKey;
+var payload    = {};
+var schema     = [];
 
-$(window).ready(onRender);
-
-function onRender() {
+$(window).ready(function () {
     connection.trigger('ready');
-    connection.trigger('requestTriggerEventDefinition');
+});
+
+/* ── 1. Recibir el schema de la Entry Source ── */
+connection.on('requestedSchema', function (data) {
+    $('#loadingMsg').hide();
+
+    schema = (data && data['schema']) ? data['schema'] : [];
+
+    if (schema.length === 0) {
+        $('#idCitaField').append('<option value="" disabled>No se encontraron campos</option>');
+        $('#fechaCitaField').append('<option value="" disabled>No se encontraron campos</option>');
+    }
+
+    schema.forEach(function (field) {
+        var key   = field.key;          // e.g. "Event.DE_Name.FieldName"
+        var label = field.label || key;
+
+        var opt1 = $('<option>').val(key).text(label);
+        var opt2 = $('<option>').val(key).text(label);
+
+        $('#idCitaField').append(opt1);
+        $('#fechaCitaField').append(opt2);
+    });
+
+    /* Restaurar selección si ya había configuración guardada */
+    restoreFromPayload();
+
+    /* Habilitar botón Done */
+    connection.trigger('updateButton', { button: 'done', enabled: true });
+});
+
+/* ── 2. Recibir payload guardado (al reabrir la actividad) ── */
+connection.on('initActivity', function (data) {
+    payload = data || {};
+
+    /* requestSchema aquí para asegurarnos de tener el schema antes de restaurar */
+    $('#loadingMsg').show();
+    connection.trigger('requestSchema');
+});
+
+/* ── 3. Restaurar valores guardados en los selects ── */
+function restoreFromPayload() {
+    try {
+        var inArgs = payload
+            && payload.arguments
+            && payload.arguments.execute
+            && payload.arguments.execute.inArguments
+            && payload.arguments.execute.inArguments[0];
+
+        if (!inArgs) return;
+
+        if (inArgs.Id_Cita)    $('#idCitaField').val(inArgs.Id_Cita);
+        if (inArgs.Fecha_Cita) $('#fechaCitaField').val(inArgs.Fecha_Cita);
+        if (inArgs.Status)     $('#statusField').val(inArgs.Status);
+
+    } catch (e) {
+        console.warn('Error al restaurar payload:', e);
+    }
 }
 
-connection.on(
-    'requestedTriggerEventDefinition',
-    function (eventDefinitionModel) {
+/* ── 4. Guardar al pulsar Done ── */
+connection.on('clickedDone', function () {
 
-        const fields =
-            eventDefinitionModel
-                ?.dataExtensionName
-                ? eventDefinitionModel.schema
-                : [];
+    var idCita    = $('#idCitaField').val();
+    var fechaCita = $('#fechaCitaField').val();
+    var status    = $('#statusField').val();
 
-        if (
-            eventDefinitionModel &&
-            eventDefinitionModel.schema &&
-            eventDefinitionModel.schema.arguments &&
-            eventDefinitionModel.schema.arguments.execute &&
-            eventDefinitionModel.schema.arguments.execute.inArguments
-        ) {
-
-            const inArgs =
-                eventDefinitionModel
-                    .schema
-                    .arguments
-                    .execute
-                    .inArguments;
-
-            inArgs.forEach(field => {
-
-                Object.keys(field)
-                    .forEach(key => {
-
-                    $('#idCitaField')
-                        .append(
-                            `<option value="${key}">
-                                ${key}
-                            </option>`
-                        );
-                });
-            });
-        }
-
-        connection.trigger(
-            'updateButton',
-            {
-                button: 'done',
-                enabled: true
-            }
-        );
+    if (!idCita || !fechaCita || !status) {
+        alert('Por favor completa los campos Id_Cita, Fecha_Cita y Status antes de continuar.');
+        return;
     }
-);
 
-connection.on(
-    'initActivity',
-    function(data) {
-
-        payload = data || {};
-    }
-);
-
-connection.on(
-    'clickedDone',
-    save
-);
-
-function save() {
-
-    const selectedField =
-        $('#idCitaField').val();
-
-    const status =
-        $('#status').val();
-
-    payload.metaData =
-        payload.metaData || {};
-
+    payload.metaData = payload.metaData || {};
     payload.metaData.isConfigured = true;
 
-    payload.arguments =
-        payload.arguments || {};
+    payload.arguments = payload.arguments || {};
+    payload.arguments.execute = payload.arguments.execute || {};
 
-    payload.arguments.execute = {
-        inArguments: [
-            {
-                Id_Cita:
-                    `{{Event.${selectedField}}}`,
-                Status:
-                    status,
-                Fecha:
-                    "{{Context.ExecutionDate}}"
-            }
-        ]
-    };
+    payload.arguments.execute.inArguments = [
+        {
+            Id_Cita:    '{{' + idCita + '}}',
+            Fecha_Cita: '{{' + fechaCita + '}}',
+            Status:     status
+        }
+    ];
 
-    connection.trigger(
-        'updateActivity',
-        payload
-    );
-}
-
+    connection.trigger('updateActivity', payload);
+});
 </script>
 
 </body>
