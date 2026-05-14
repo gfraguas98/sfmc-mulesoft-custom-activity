@@ -5,41 +5,37 @@ const path = require('path');
 const app = express();
 
 app.use(bodyParser.json());
-app.use(express.static('public'));
 
-// ROOT = CONFIG.JSON (IMPORTANTE)
+// ROOT = CONFIG.JSON
 app.get('/', (req, res) => {
     res.type('application/json');
     res.sendFile(path.join(__dirname, 'config.json'));
 });
 
-// UI DEL MODAL
-app.get('/ui', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// UI HTML (archivo en raíz)
+app.get('/index.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// JOURNEY CALLBACKS
+// CALLBACKS JOURNEY
 app.post('/save', (req, res) => {
-    console.log('SAVE');
     return res.status(200).json({});
 });
 
 app.post('/publish', (req, res) => {
-    console.log('PUBLISH');
     return res.status(200).json({});
 });
 
 app.post('/validate', (req, res) => {
-    console.log('VALIDATE');
     return res.status(200).json({});
 });
 
 app.post('/stop', (req, res) => {
-    console.log('STOP');
     return res.status(200).json({});
 });
 
 app.post('/execute', (req, res) => {
+
     console.log('EXECUTE');
     console.log(JSON.stringify(req.body, null, 2));
 
