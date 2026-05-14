@@ -28,5 +28,12 @@
     "validate": {
       "url": "https://sfmc-mulesoft-custom-activity.onrender.com/validate"
     }
+  },
+  "userInterfaces": {
+    "configModal": {
+      "url": "https://sfmc-mulesoft-custom-activity.onrender.com/index.html",
+      "height": 450,
+      "width": 700
+    }
   }
 }
