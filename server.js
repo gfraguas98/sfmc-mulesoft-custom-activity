@@ -5,40 +5,37 @@ const path = require('path');
 const app = express();
 
 app.use(bodyParser.json());
-
-// Static files
 app.use(express.static('public'));
 
-// Root
+// ROOT = CONFIG.JSON
 app.get('/', (req, res) => {
-    res.send('SFMC Custom Activity Running');
+    res.sendFile(path.join(__dirname, 'config.json'));
 });
 
-// CONFIG.JSON
-app.get('/config.json', (req, res) => {
-    res.type('application/json');
-    res.sendFile(path.join(__dirname, 'config.json'));
+// CONFIG UI
+app.get('/ui', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // JOURNEY ENDPOINTS
 app.post('/save', (req, res) => {
     console.log('SAVE');
-    res.status(200).json({});
+    return res.status(200).json({});
 });
 
 app.post('/publish', (req, res) => {
     console.log('PUBLISH');
-    res.status(200).json({});
+    return res.status(200).json({});
 });
 
 app.post('/validate', (req, res) => {
     console.log('VALIDATE');
-    res.status(200).json({});
+    return res.status(200).json({});
 });
 
 app.post('/stop', (req, res) => {
     console.log('STOP');
-    res.status(200).json({});
+    return res.status(200).json({});
 });
 
 app.post('/execute', (req, res) => {
@@ -46,7 +43,7 @@ app.post('/execute', (req, res) => {
     console.log('EXECUTE');
     console.log(JSON.stringify(req.body, null, 2));
 
-    res.status(200).json({
+    return res.status(200).json({
         success: true
     });
 });
