@@ -12,37 +12,30 @@
   },
   "arguments": {
     "execute": {
-      "inArguments": [],
-      "outArguments": [],
       "url": "https://sfmc-mulesoft-custom-activity.onrender.com/execute",
       "verb": "POST",
+      "inArguments": [],
+      "outArguments": [],
       "body": "",
-      "format": "json",
-      "useJwt": false,
-      "timeout": 10000
+      "format": "json"
     }
   },
   "configurationArguments": {
-    "applicationExtensionKey": "mulesoft-cancellation",
     "save": {
       "url": "https://sfmc-mulesoft-custom-activity.onrender.com/save",
-      "verb": "POST",
-      "useJwt": false
+      "verb": "POST"
     },
     "publish": {
       "url": "https://sfmc-mulesoft-custom-activity.onrender.com/publish",
-      "verb": "POST",
-      "useJwt": false
+      "verb": "POST"
     },
     "validate": {
       "url": "https://sfmc-mulesoft-custom-activity.onrender.com/validate",
-      "verb": "POST",
-      "useJwt": false
+      "verb": "POST"
     },
     "stop": {
       "url": "https://sfmc-mulesoft-custom-activity.onrender.com/stop",
-      "verb": "POST",
-      "useJwt": false
+      "verb": "POST"
     }
   },
   "userInterfaces": {
